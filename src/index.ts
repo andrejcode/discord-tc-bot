@@ -1,8 +1,17 @@
-import app from './app';
+import 'dotenv/config';
+import createApp from './app';
+import createDatabase from './database';
 
-const PORT = 3000;
+const { DATABASE_URL, PORT } = process.env;
 
-app.listen(PORT, () => {
+if (!DATABASE_URL) {
+  throw new Error('Provide DATABASE_URL in your environment variables.');
+}
+
+const database = createDatabase(DATABASE_URL);
+const app = createApp(database);
+
+app.listen(PORT || 3000, () => {
   // eslint-disable-next-line no-console
-  console.log(`Server is running at http://localhost:${PORT}`);
+  console.log(`Server is running at http://localhost:${PORT || 3000}`);
 });
