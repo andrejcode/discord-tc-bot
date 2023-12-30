@@ -1,7 +1,16 @@
+/* eslint-disable no-console */
 import express from 'express';
+import messages from './modules/messages/controller';
+import sprints from './modules/sprints/controller';
+import type { Database } from '@/database';
 
-const app = express();
+export default function createApp(db: Database) {
+  const app = express();
 
-app.get('/', (req, res) => res.send('Hello World!'));
+  app.use(express.json());
 
-export default app;
+  app.use('/messages', messages(db));
+  app.use('/sprints', sprints(db));
+
+  return app;
+}
