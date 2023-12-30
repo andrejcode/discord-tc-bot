@@ -15,7 +15,10 @@ Discord Bot that congratulates you when you finish a sprint at Turing College.
 ## Endpoints
 
 - `GET /messages` - Get a list of all congratulatory messages.
-- `POST /messages` - Send a congratulatory message to a user on Discord or create a new message depending in the body.
+- `POST /messages` - Send a congratulatory message to a user on Discord or create a new message depending on the body.
 - `GET /messages?username=johdoe` - get a list of all congratulatory messages for a specific user
 - `GET /messages?sprint=WD-1.1` - get a list of all congratulatory messages for a specific sprint
-- `CRUD /sprints` - POST/GET/PATCH/DELETE endpoints for managing sprints
+- `GET/PATCH/DELETE /messages/:id` - Get, update, and delete a message by id.
+- `GET /sprints` - Get a list of all the sprints.
+- `POST /sprints` - Create a new sprint.
+- `GET/PATCH/DELETE /sprints/:id` - Get, update, and delete a sprint by id.
