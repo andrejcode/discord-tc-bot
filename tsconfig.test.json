@@ -1,9 +1,13 @@
 {
   "extends": "@tsconfig/node18/tsconfig.json",
-  "include": ["**/*.ts", ".eslintrc.cjs", "vitest.config.js"],
 
   "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "types": ["vitest/globals"],
+
     "strict": true,
+    "composite": true,
     "paths": {
       "@/*": ["./src/*"],
       "@tests/*": ["./tests/*"]

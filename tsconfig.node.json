@@ -1,6 +1,6 @@
 {
   "extends": "@tsconfig/node18/tsconfig.json",
-  "include": ["**/*.ts", ".eslintrc.cjs", "vitest.config.js"],
+  "exclude": ["**/*.spec.ts", "**/*.test.ts"],
 
   "compilerOptions": {
     "strict": true,
