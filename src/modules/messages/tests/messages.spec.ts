@@ -85,30 +85,30 @@ describe('GET /messages', () => {
 });
 
 describe('POST /messages', () => {
-  it('should return 500 if no body provided', async () => {
-    const { text } = await supertest(app).post('/messages').expect(500);
-    expect(text).toEqual('No body provided.');
+  it('should return 400 if no body provided', async () => {
+    const { text } = await supertest(app).post('/messages').expect(400);
+    expect(text).toEqual('No payload provided.');
   });
 
   it('should create a new message', async () => {
-    const { body } = await supertest(app)
+    const { text } = await supertest(app)
       .post('/messages')
       .send({ message: 'New message' })
       .expect(201);
 
-    expect(body).toEqual({ message: 'New message' });
+    expect(text).toEqual('Message successfully created.');
 
     await db
       .deleteFrom('messages')
-      .where('message', '=', body.message)
+      .where('message', '=', 'New message')
       .execute();
   });
 
-  it('should return 500 when sprint code does not exist', async () => {
+  it('should return 400 when sprint code does not exist', async () => {
     const { text } = await supertest(app)
       .post('/messages')
       .send({ username: 'user', sprintCode: 'NON_EXISTING_SPRINT_CODE' })
-      .expect(500);
+      .expect(400);
 
     expect(text).toEqual('Unable to send message on Discord.');
   });
@@ -160,5 +160,30 @@ describe('DELETE /messages/:id', () => {
     const { text } = await supertest(app).delete('/messages/999').expect(200);
 
     expect(text).toEqual('Message deleted.');
+  });
+
+  it('should not be able to remove message if it is used in sprints', async () => {
+    const message: Insertable<Messages> = {
+      id: 999,
+      message: 'Some message',
+    };
+    await createMessages(message);
+
+    const sprints: Insertable<Sprints> = {
+      messageId: 999,
+      sprintCode: 'WD-TEST',
+      sprintTitle: 'Test Sprint Title',
+    };
+    await createSprints(sprints);
+
+    const { text } = await supertest(app).delete('/messages/999').expect(400);
+    expect(text).toEqual('Unable to delete the message.');
+
+    await db
+      .deleteFrom('sprints')
+      .where('sprintCode', '=', 'WD-TEST')
+      .execute();
+
+    await db.deleteFrom('messages').where('id', '=', 999).execute();
   });
 });
