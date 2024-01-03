@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { Client } from 'discord.js';
 import { Database } from '@/database';
 import buildRepository from './repository';
 import buildSprintsRepository from '../sprints/repository';
@@ -9,9 +10,9 @@ import * as sprintSchema from '../sprints/schema';
 import * as usersSchema from '../users/schema';
 import * as usersMessagesSchema from '../users-messages/schema';
 import fetchGif from '@/api/tenor';
-import sendDiscordMessage from '@/api/discord';
+import { sendMessage } from '@/api/discord';
 
-export default (db: Database) => {
+export default (db: Database, discordClient: Client) => {
   const router = Router();
   const messages = buildRepository(db);
   const sprints = buildSprintsRepository(db);
@@ -32,7 +33,7 @@ export default (db: Database) => {
           const result = await messages.findById(messageId);
           res.status(200).json(result);
         } catch (e) {
-          res.status(500).send('Unable to get messages for sprint.');
+          res.status(400).send('Unable to get messages for sprint.');
         }
       } else if (username) {
         try {
@@ -59,14 +60,14 @@ export default (db: Database) => {
             throw new Error('User not found.');
           }
         } catch (e) {
-          res.status(500).send('Unable to get message for the user');
+          res.status(400).send('Unable to get message for the user');
         }
       } else {
         try {
           const result = await messages.findAll();
           res.status(200).json(result);
         } catch (e) {
-          res.status(500).send('Unable to get messages.');
+          res.status(400).send('Unable to get messages.');
         }
       }
     })
@@ -102,7 +103,7 @@ export default (db: Database) => {
               combinedMessage += `\n${tenorGif}`;
             }
 
-            sendDiscordMessage(combinedMessage);
+            sendMessage(discordClient, combinedMessage);
           }
 
           const record = usersMessagesSchema.parseInsertable({
@@ -113,18 +114,18 @@ export default (db: Database) => {
 
           res.status(200).send('Sending message on Discord.');
         } catch (e) {
-          res.status(500).send('Unable to send message on Discord.');
+          res.status(400).send('Unable to send message on Discord.');
         }
       } else if (message) {
         try {
           const body = schema.parseInsertable({ message });
           await messages.create(body);
-          res.status(201).send(body);
+          res.status(201).send('Message successfully created.');
         } catch (e) {
-          res.status(500).send('Unable to create a new message.');
+          res.status(400).send('Unable to create a new message.');
         }
       } else {
-        res.status(500).send('No body provided.');
+        res.status(400).send('No payload provided.');
       }
     });
 
@@ -136,7 +137,7 @@ export default (db: Database) => {
         const result = await messages.findById(id);
         res.status(200).json(result);
       } catch (e) {
-        res.status(500).send('Unable to get the message.');
+        res.status(400).send('Unable to get the message.');
       }
     })
     .patch(async (req, res) => {
@@ -146,7 +147,7 @@ export default (db: Database) => {
         const record = await messages.update(id, bodyPatch);
         res.status(200).json(record);
       } catch (e) {
-        res.status(500).send('Unable to update the message.');
+        res.status(400).send('Unable to update the message.');
       }
     })
     .delete(async (req, res) => {
@@ -155,7 +156,7 @@ export default (db: Database) => {
         await messages.remove(id);
         res.status(200).send('Message deleted.');
       } catch (e) {
-        res.status(500).send('Unable to delete the message.');
+        res.status(400).send('Unable to delete the message.');
       }
     });
 
