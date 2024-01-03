@@ -1,10 +1,10 @@
 /* eslint-disable no-console */
 import 'dotenv/config';
-import { Client, Events, GatewayIntentBits, TextChannel } from 'discord.js';
+import { Client, GatewayIntentBits, TextChannel } from 'discord.js';
 
 const { TOKEN, CHANNEL_ID } = process.env;
 
-function createNewClient() {
+export function createNewClient() {
   const client = new Client({
     intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages],
   });
@@ -12,32 +12,25 @@ function createNewClient() {
   return client;
 }
 
-function sendMessage(client: Client, message: string) {
-  client.once(Events.ClientReady, (readyClient) => {
-    console.log(`Ready! Logged in as ${readyClient.user.tag}`);
+export function sendMessage(client: Client, message: string) {
+  const channel = client.channels.cache.get(
+    CHANNEL_ID as string
+  ) as TextChannel;
 
-    const channel = readyClient.channels.cache.get(
-      CHANNEL_ID as string
-    ) as TextChannel;
-
-    try {
-      channel.send(message);
-      console.log('Message sent');
-    } catch (e) {
-      console.error(e);
-    } finally {
-      console.log('Logging out');
-      readyClient.destroy();
-    }
-  });
+  try {
+    channel.send(message);
+    console.log('Message sent on Discord channel.');
+  } catch (e) {
+    console.error('Unable to sent message on Discord channel.');
+  }
 }
 
-function loginClient(client: Client) {
+export function loginClient(client: Client) {
+  console.log('Logging client.');
   client.login(TOKEN);
 }
 
-export default function sendDiscordMessage(message: string): void {
-  const client = createNewClient();
-  loginClient(client);
-  sendMessage(client, message);
+export function logoutClient(client: Client) {
+  console.log('Logging out client.');
+  client.destroy();
 }
