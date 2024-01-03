@@ -15,18 +15,23 @@ export default (db: Database) => {
 
         res.status(200).json(result);
       } catch (e) {
-        res.status(500).send('Unable to get sprints');
+        res.status(400).send('Unable to get sprints.');
       }
     })
     .post(async (req, res) => {
       try {
         const body = schema.parseInsertable(req.body);
 
-        await sprints.create(body);
+        const sprintsFound = await sprints.findBySprintCode(body.sprintCode);
 
-        res.status(201).send('New sprint created successfully.');
+        if (sprintsFound.length !== 0) {
+          res.status(400).send('Sprint already exists.');
+        } else {
+          await sprints.create(body);
+          res.status(201).send('New sprint created successfully.');
+        }
       } catch (e) {
-        res.status(500).send('Unable to create a new sprint.');
+        res.status(400).send('Unable to create a new sprint.');
       }
     });
 
