@@ -1,5 +1,6 @@
 {
   "name": "amilan-be.2.5",
+  "private": true,
   "version": "1.0.0",
   "description": "Discord Bot that congratulates you when you finish a sprint",
   "main": "index.js",

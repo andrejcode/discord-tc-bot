@@ -1,16 +1,18 @@
 # Turing College Discord Bot
 
-## Introduction
-
 Discord Bot that congratulates you when you finish a sprint at Turing College.
 
 ## Getting Started
 
 - Create your discord bot application and add it to your server. You can visit [Setting up a bot application](https://discordjs.guide/preparations/setting-up-a-bot-application.html#creating-your-bot) and [Adding your bot to server](https://discordjs.guide/preparations/adding-your-bot-to-servers.html) for more details.
 
+- Create SQLite database and run `npm run migrate:latest` command to run migrations.
+
 - Add your environment variables to the .env file. You can see the examples in .env.example file.
 
 - Run `npm install` to install all node modules.
+
+- Finally to start dev server run `npm run dev`.
 
 ## Endpoints
 
